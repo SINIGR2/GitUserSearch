@@ -12,20 +12,25 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp">
 
             <EditText
                 android:id="@+id/search_edittext"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.8"
-                android:hint="Введите имя  пользователя"/>
+                android:layout_weight="0.85"
+                android:hint="Введите имя  пользователя"
+                android:inputType="none" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/search_button"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.2" />
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="0.15"
+                android:background="@color/colorLightGray"
+                android:src="@drawable/ic_search_black_24dp" />
         </LinearLayout>
 
         <ListView
@@ -51,13 +56,14 @@
         style="@style/Widget.AppCompat.ProgressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+        android:layout_centerInParent="true"
+        android:visibility="invisible"/>
 
     <ImageView
         android:id="@+id/avatar_imageview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="20dp"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop" />
 
 </RelativeLayout>

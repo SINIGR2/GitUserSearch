@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -16,6 +17,7 @@ import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button searchButton = findViewById(R.id.search_button);
+        ImageButton searchButton = findViewById(R.id.search_button);
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,13 +76,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                             avatarImageView.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    usersListView.setVisibility(View.VISIBLE);
                                     avatarImageView.setVisibility(View.GONE);
                                 }
                             });
 
                             Glide.with(MainActivity.this).load(currentUser.getUserAvatarUrl()).into(avatarImageView);
-                            usersListView.setVisibility(View.GONE);
                             avatarImageView.setVisibility(View.VISIBLE);
                         }
                     });
