@@ -13,6 +13,8 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -76,12 +78,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                             avatarImageView.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
+                                    Animation slideDown = AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_down);
                                     avatarImageView.setVisibility(View.GONE);
+                                    avatarImageView.startAnimation(slideDown);
                                 }
                             });
 
+                            Animation slideUp = AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_up);
                             Glide.with(MainActivity.this).load(currentUser.getUserAvatarUrl()).into(avatarImageView);
                             avatarImageView.setVisibility(View.VISIBLE);
+                            avatarImageView.setAnimation(slideUp);
                         }
                     });
 
