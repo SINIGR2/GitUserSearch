@@ -25,23 +25,40 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<User>> {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-    private static final String SEARCH_REQUEST_URL = "https://api.github.com/search/users";
+public class MainActivity
+        extends AppCompatActivity
+        //implements LoaderManager.LoaderCallbacks<List<User>>
+{
+
+    private static final String SEARCH_REQUEST_URL = "https://api.github.com/";
     private UserAdapter mAdapter;
     private static final int USER_LOADER_ID = 1;
     private TextView mEmptyStateTextView;
     private String username;
+
+    List<User> users;
+    ListView userList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        users = new ArrayList<>();
+        userList = findViewById(R.id.user_list);
         ImageButton searchButton = findViewById(R.id.search_button);
+        mAdapter = new UserAdapter(MainActivity.this, users);
+        userList.setAdapter(mAdapter);
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,7 +66,28 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 EditText usernameEditText = findViewById(R.id.search_edittext);
                 username = usernameEditText.getText().toString();
 
-                final ListView usersListView = findViewById(R.id.user_list);
+                App.getApi().getUser("bob").enqueue(new Callback<User>() {
+                    @Override
+                    public void onResponse(Call<User> call, Response<User> response) {
+                        if (response.isSuccessful()) {
+
+                            //users.addAll(response.body().get
+                            userList.setAdapter(mAdapter);
+                            //users.forEach(change -> System.out.println(change.subject));
+                        } else {
+                            System.out.println(response.errorBody());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<User> call, Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
+
+                //Response response = MainActivity.getApi().loadUsers("bob").execute();
+
+                /*final ListView usersListView = findViewById(R.id.user_list);
 
                 mEmptyStateTextView = findViewById(R.id.empty_view);
                 usersListView.setEmptyView(mEmptyStateTextView);
@@ -100,10 +138,26 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                         mEmptyStateTextView.setText(R.string.no_internet_connection);
                     }
-                }
+                }*/
             }
         });
     }
+
+    /*@Override
+    public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+        if(response.isSuccessful()) {
+            List<User> changesList = response.body();
+            //changesList.forEach(change -> System.out.println(change.subject));
+        } else {
+            System.out.println(response.errorBody());
+        }
+    }
+
+    @Override
+    public void onFailure(Call<List<User>> call, Throwable t) {
+        t.printStackTrace();
+    }*/
+
 
     public Loader<List<User>> onCreateLoader(int id, Bundle bundle) {
 
@@ -115,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return new UserLoader(this, uriBuilder.toString());
     }
 
-    @Override
+    /*@Override
     public void onLoadFinished(Loader<List<User>> loader, List<User> users) {
         View loadingIndicator = findViewById(R.id.loading_indicator);
         loadingIndicator.setVisibility(View.GONE);
@@ -132,5 +186,5 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoaderReset(Loader<List<User>> loader) {
         mAdapter.clear();
-    }
+    }*/
 }

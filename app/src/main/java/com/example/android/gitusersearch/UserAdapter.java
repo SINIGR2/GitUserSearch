@@ -23,9 +23,10 @@ public class UserAdapter extends ArrayAdapter<User> {
             listItemView = LayoutInflater.from(getContext()).inflate(R.layout.user_list_item, parent, false);
 
         User currentUser = getItem(position);
+        //String login = currentUser.getItems().get(position).getLogin();
 
         TextView usernameTextView = listItemView.findViewById(R.id.username_textview);
-        usernameTextView.setText(currentUser.getUserName());
+        usernameTextView.setText(currentUser.getItems().get(position).getLogin());//getUserName());
 
         return listItemView;
     }

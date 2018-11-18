@@ -43,8 +43,8 @@ public class QueryUtils {
                 String login = currentUser.getString("login");
                 String avatar_url = currentUser.getString("avatar_url");
 
-                User user = new User(login, avatar_url);
-                users.add(user);
+                /*User user = new User(login, avatar_url);
+                users.add(user);*/
             }
 
         } catch (JSONException e) {
