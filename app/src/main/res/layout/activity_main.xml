@@ -33,10 +33,10 @@
                 android:src="@drawable/ic_search_black_24dp" />
         </LinearLayout>
 
-        <ListView
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/user_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:divider="@color/colorPrimary"
             android:dividerHeight="1dp"

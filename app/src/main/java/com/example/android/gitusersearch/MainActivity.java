@@ -12,6 +12,8 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
@@ -19,14 +21,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import retrofit2.Call;
@@ -46,8 +51,8 @@ public class MainActivity
     private TextView mEmptyStateTextView;
     private String username;
 
-    List<User> users;
-    ListView userList;
+    List<User.Item> users;
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +60,13 @@ public class MainActivity
         setContentView(R.layout.activity_main);
 
         users = new ArrayList<>();
-        userList = findViewById(R.id.user_list);
+        recyclerView = findViewById(R.id.user_list);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
         ImageButton searchButton = findViewById(R.id.search_button);
-        mAdapter = new UserAdapter(MainActivity.this, users);
-        userList.setAdapter(mAdapter);
+
+        UserAdapter adapter = new UserAdapter(users);
+        recyclerView.setAdapter(adapter);
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,10 +78,8 @@ public class MainActivity
                     @Override
                     public void onResponse(Call<User> call, Response<User> response) {
                         if (response.isSuccessful()) {
-
-                            //users.addAll(response.body().get
-                            userList.setAdapter(mAdapter);
-                            //users.forEach(change -> System.out.println(change.subject));
+                            users.addAll(response.body().getItems());
+                            recyclerView.getAdapter().notifyDataSetChanged();
                         } else {
                             System.out.println(response.errorBody());
                         }
