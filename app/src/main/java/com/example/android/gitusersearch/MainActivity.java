@@ -1,49 +1,24 @@
 package com.example.android.gitusersearch;
 
-import android.app.LoaderManager;
-import android.content.Context;
-import android.content.Intent;
-import android.content.Loader;
-import android.content.SharedPreferences;
-import android.media.Image;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.Adapter;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity
-        extends AppCompatActivity
-        //implements LoaderManager.LoaderCallbacks<List<User>>
-{
+        extends AppCompatActivity {
 
     private static final String SEARCH_REQUEST_URL = "https://api.github.com/";
     private UserAdapter mAdapter;
@@ -51,8 +26,9 @@ public class MainActivity
     private TextView mEmptyStateTextView;
     private String username;
 
-    List<User.Item> users;
-    RecyclerView recyclerView;
+    private List<User.Item> users;
+    private RecyclerView recyclerView;
+    private ProgressDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +41,8 @@ public class MainActivity
         recyclerView.setLayoutManager(layoutManager);
         ImageButton searchButton = findViewById(R.id.search_button);
 
-        UserAdapter adapter = new UserAdapter(users);
-        recyclerView.setAdapter(adapter);
+        mAdapter = new UserAdapter(MainActivity.this, users);
+        recyclerView.setAdapter(mAdapter);
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,11 +50,17 @@ public class MainActivity
                 EditText usernameEditText = findViewById(R.id.search_edittext);
                 username = usernameEditText.getText().toString();
 
-                App.getApi().getUser("bob").enqueue(new Callback<User>() {
+                pDialog = new ProgressDialog(MainActivity.this);
+                pDialog.setMessage("Loading...");
+                pDialog.show();
+
+                App.getApi().getUser(username).enqueue(new Callback<User>() {
                     @Override
                     public void onResponse(Call<User> call, Response<User> response) {
                         if (response.isSuccessful()) {
+                            hidePDialog();
                             users.addAll(response.body().getItems());
+                            mAdapter.notifyDataSetChanged();
                             recyclerView.getAdapter().notifyDataSetChanged();
                         } else {
                             System.out.println(response.errorBody());
@@ -87,7 +69,7 @@ public class MainActivity
 
                     @Override
                     public void onFailure(Call<User> call, Throwable t) {
-                        t.printStackTrace();
+                        hidePDialog();
                     }
                 });
 
@@ -149,48 +131,10 @@ public class MainActivity
         });
     }
 
-    /*@Override
-    public void onResponse(Call<List<User>> call, Response<List<User>> response) {
-        if(response.isSuccessful()) {
-            List<User> changesList = response.body();
-            //changesList.forEach(change -> System.out.println(change.subject));
-        } else {
-            System.out.println(response.errorBody());
+    private void hidePDialog() {
+        if (pDialog != null) {
+            pDialog.dismiss();
+            pDialog = null;
         }
     }
-
-    @Override
-    public void onFailure(Call<List<User>> call, Throwable t) {
-        t.printStackTrace();
-    }*/
-
-
-    public Loader<List<User>> onCreateLoader(int id, Bundle bundle) {
-
-        Uri baseUri = Uri.parse(SEARCH_REQUEST_URL);
-        Uri.Builder uriBuilder = baseUri.buildUpon();
-
-        uriBuilder.appendQueryParameter("q", username);
-
-        return new UserLoader(this, uriBuilder.toString());
-    }
-
-    /*@Override
-    public void onLoadFinished(Loader<List<User>> loader, List<User> users) {
-        View loadingIndicator = findViewById(R.id.loading_indicator);
-        loadingIndicator.setVisibility(View.GONE);
-
-        mEmptyStateTextView.setText(R.string.no_user);
-
-        mAdapter.clear();
-
-        if (users != null && !users.isEmpty()) {
-            mAdapter.addAll(users);
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<User>> loader) {
-        mAdapter.clear();
-    }*/
 }

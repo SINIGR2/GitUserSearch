@@ -1,25 +1,25 @@
 package com.example.android.gitusersearch;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
+import android.app.Activity;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.support.v7.widget.RecyclerView;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
-   /* public UserAdapter(@NonNull Context context, List<User> user) {
-        super(context, 0, user);
-    }*/
-
+    private Activity activity;
     private List<User.Item> users;
 
-    public UserAdapter(List<User.Item> users) {
+    public UserAdapter(Activity activity, List<User.Item> users) {
+
+        this.activity = activity;
         this.users = users;
     }
 
@@ -33,6 +33,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         User.Item user = users.get(position);
         holder.name.setText(user.getLogin());
+        Glide.with(activity).load(users.get(position).getAvatarUrl()).into(holder.avatar);
     }
 
     @Override
@@ -42,29 +43,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         return users.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
+        ImageView avatar;
         TextView name;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            name = itemView.findViewById(R.id.username_textview);
+            avatar = itemView.findViewById(R.id.avatar_image_view);
+            name = itemView.findViewById(R.id.username_text_view);
         }
     }
-
-    /*@Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View listItemView = convertView;
-        if (listItemView == null)
-            listItemView = LayoutInflater.from(getContext()).inflate(R.layout.user_list_item, parent, false);
-
-        User currentUser = getItem(position);
-        //String login = currentUser.getLogin();
-
-        TextView usernameTextView = listItemView.findViewById(R.id.username_textview);
-        //usernameTextView.setText(currentUser.getItems().get(position).getLogin()););
-
-
-        return listItemView;
-    }*/
 }
