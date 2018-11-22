@@ -3,11 +3,12 @@ package com.example.android.gitusersearch;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -27,8 +28,9 @@ public class MainActivity
     private String username;
 
     private List<User.Item> users;
-    private RecyclerView recyclerView;
     private ProgressDialog pDialog;
+
+    private ListView userListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,13 +38,8 @@ public class MainActivity
         setContentView(R.layout.activity_main);
 
         users = new ArrayList<>();
-        recyclerView = findViewById(R.id.user_list);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
+        userListView = findViewById(R.id.user_list);
         ImageButton searchButton = findViewById(R.id.search_button);
-
-        mAdapter = new UserAdapter(MainActivity.this, users);
-        recyclerView.setAdapter(mAdapter);
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,8 +57,8 @@ public class MainActivity
                         if (response.isSuccessful()) {
                             hidePDialog();
                             users.addAll(response.body().getItems());
-                            mAdapter.notifyDataSetChanged();
-                            recyclerView.getAdapter().notifyDataSetChanged();
+                            mAdapter = new UserAdapter(MainActivity.this, users);
+                            userListView.setAdapter(mAdapter);
                         } else {
                             System.out.println(response.errorBody());
                         }
@@ -70,6 +67,17 @@ public class MainActivity
                     @Override
                     public void onFailure(Call<User> call, Throwable t) {
                         hidePDialog();
+                    }
+                });
+
+                userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+
+                        /*User.Item currentUser = mAdapter.getItem(position);
+                        final ImageView avatarImageView = findViewById(R.id.avatar_imageview);
+                        avatarImageView.setVisibility(View.VISIBLE);*/
                     }
                 });
 
@@ -82,11 +90,7 @@ public class MainActivity
 
                 LoaderManager loaderManager;
 
-                Toast msg;
-
                 if (username.isEmpty()) {
-                    msg = Toast.makeText(getApplicationContext(), "Введено пустое имя!", Toast.LENGTH_SHORT);
-                    msg.show();
                     return;
                 } else {
                     mAdapter = new UserAdapter(MainActivity.this, new ArrayList<User>());
@@ -110,22 +114,6 @@ public class MainActivity
                             avatarImageView.setVisibility(View.VISIBLE);
                         }
                     });
-
-                    ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-                    NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-
-                    if (networkInfo != null && networkInfo.isConnected()) {
-                        loaderManager = getLoaderManager();
-                        if (loaderManager == null)
-                            loaderManager.initLoader(USER_LOADER_ID, null, MainActivity.this);
-                        else
-                            loaderManager.restartLoader(USER_LOADER_ID, null, MainActivity.this);
-                    } else {
-                        View loadingIndicator = findViewById(R.id.loading_indicator);
-                        loadingIndicator.setVisibility(View.GONE);
-
-                        mEmptyStateTextView.setText(R.string.no_internet_connection);
-                    }
                 }*/
             }
         });

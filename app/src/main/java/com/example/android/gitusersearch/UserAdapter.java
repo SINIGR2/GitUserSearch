@@ -1,10 +1,11 @@
 package com.example.android.gitusersearch;
 
-import android.app.Activity;
-import android.support.v7.widget.RecyclerView;
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -12,46 +13,30 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
+public class UserAdapter extends ArrayAdapter<User.Item> {//RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
-    private Activity activity;
     private List<User.Item> users;
+    private Context mContext;
+    private ImageView avatar;
+    private TextView name;
 
-    public UserAdapter(Activity activity, List<User.Item> users) {
-
-        this.activity = activity;
+    public UserAdapter(@NonNull Context context, List<User.Item> users) {
+        super(context, 0, users);
+        mContext = context;
         this.users = users;
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_list_item, parent, false);
-        return new ViewHolder(v);
-    }
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View listItemView = convertView;
+        listItemView = LayoutInflater.from(getContext()).inflate(R.layout.user_list_item, parent, false);
 
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        User.Item user = users.get(position);
-        holder.name.setText(user.getLogin());
-        Glide.with(activity).load(users.get(position).getAvatarUrl()).into(holder.avatar);
-    }
+        avatar = listItemView.findViewById(R.id.avatar_image_view);
+        name = listItemView.findViewById(R.id.username_text_view);
 
-    @Override
-    public int getItemCount() {
-        if (users == null)
-            return 0;
-        return users.size();
-    }
+        Glide.with(mContext).load(users.get(position).getAvatarUrl()).into(avatar);
+        name.setText(users.get(position).getLogin());
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-
-        ImageView avatar;
-        TextView name;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            avatar = itemView.findViewById(R.id.avatar_image_view);
-            name = itemView.findViewById(R.id.username_text_view);
-        }
+        return listItemView;
     }
 }
