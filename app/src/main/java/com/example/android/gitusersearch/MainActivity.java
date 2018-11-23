@@ -1,18 +1,23 @@
 package com.example.android.gitusersearch;
 
 import android.app.ProgressDialog;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.datatype.Duration;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,10 +32,13 @@ public class MainActivity
     private TextView mEmptyStateTextView;
     private String username;
 
+    private List<ImageView> avatars;
     private List<User.Item> users;
     private ProgressDialog pDialog;
 
     private ListView userListView;
+    private ImageButton searchButton;
+    private ImageView avatarImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,14 +46,24 @@ public class MainActivity
         setContentView(R.layout.activity_main);
 
         users = new ArrayList<>();
+        avatars = new ArrayList<>();
         userListView = findViewById(R.id.user_list);
-        ImageButton searchButton = findViewById(R.id.search_button);
+        searchButton = findViewById(R.id.search_button);
+        avatarImageView = findViewById(R.id.avatar_image_view);
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 EditText usernameEditText = findViewById(R.id.search_edittext);
-                username = usernameEditText.getText().toString();
+                username = usernameEditText.getText().toString().trim();
+
+                if (username.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Не задано имя для поиска", Toast.LENGTH_SHORT);
+                    return;
+                }
+
+                users = new ArrayList<>();
+                avatars = new ArrayList<>();
 
                 pDialog = new ProgressDialog(MainActivity.this);
                 pDialog.setMessage("Loading...");
@@ -57,7 +75,7 @@ public class MainActivity
                         if (response.isSuccessful()) {
                             hidePDialog();
                             users.addAll(response.body().getItems());
-                            mAdapter = new UserAdapter(MainActivity.this, users);
+                            mAdapter = new UserAdapter(MainActivity.this, users, avatars);
                             userListView.setAdapter(mAdapter);
                         } else {
                             System.out.println(response.errorBody());
@@ -69,52 +87,24 @@ public class MainActivity
                         hidePDialog();
                     }
                 });
+            }
+        });
 
-                userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+        userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                avatarImageView.setImageDrawable(avatars.get(position).getDrawable());
+                avatarImageView.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.avatar_open_animation));
+                avatarImageView.setVisibility(View.VISIBLE);
 
+            }
+        });
 
-                        /*User.Item currentUser = mAdapter.getItem(position);
-                        final ImageView avatarImageView = findViewById(R.id.avatar_imageview);
-                        avatarImageView.setVisibility(View.VISIBLE);*/
-                    }
-                });
-
-                //Response response = MainActivity.getApi().loadUsers("bob").execute();
-
-                /*final ListView usersListView = findViewById(R.id.user_list);
-
-                mEmptyStateTextView = findViewById(R.id.empty_view);
-                usersListView.setEmptyView(mEmptyStateTextView);
-
-                LoaderManager loaderManager;
-
-                if (username.isEmpty()) {
-                    return;
-                } else {
-                    mAdapter = new UserAdapter(MainActivity.this, new ArrayList<User>());
-                    usersListView.setAdapter(mAdapter);
-
-                    usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                            User currentUser = mAdapter.getItem(position);
-
-                            final ImageView avatarImageView = findViewById(R.id.avatar_imageview);
-
-                            avatarImageView.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    avatarImageView.setVisibility(View.GONE);
-                                }
-                            });
-
-                            Glide.with(MainActivity.this).load(currentUser.getUserAvatarUrl()).into(avatarImageView);
-                            avatarImageView.setVisibility(View.VISIBLE);
-                        }
-                    });
-                }*/
+        avatarImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                avatarImageView.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.avatar_close_animation));
+                avatarImageView.setVisibility(View.GONE);
             }
         });
     }

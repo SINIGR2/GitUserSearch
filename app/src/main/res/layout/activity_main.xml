@@ -52,10 +52,9 @@
         android:textAppearance="?android:textAppearanceMedium" />
 
     <ImageView
-        android:id="@+id/avatar_imageview"
+        android:id="@+id/avatar_image_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="20dp"
         android:scaleType="centerCrop" />
 
 </RelativeLayout>
